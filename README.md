@@ -1,57 +1,95 @@
-# Sample Hardhat 3 Beta Project (`node:test` and `viem`)
+# Micromint L3 – Micropayment Layer 3 on Arbitrum
 
-This project showcases a Hardhat 3 Beta project using the native Node.js test runner (`node:test`) and the `viem` library for Ethereum interactions.
+Micromint L3 is a **Layer 3 blockchain (L3)** built on **Arbitrum Orbit** and settled on **Arbitrum Sepolia (L2)** — designed specifically for **micropayments** under ₹10 / $0.10.
 
-To learn more about the Hardhat 3 Beta, please visit the [Getting Started guide](https://hardhat.org/docs/getting-started#getting-started-with-hardhat-3). To share your feedback, join our [Hardhat 3 Beta](https://hardhat.org/hardhat3-beta-telegram-group) Telegram group or [open an issue](https://github.com/NomicFoundation/hardhat/issues/new) in our GitHub issue tracker.
+> The goal: Make **sub-$1 payments actually viable on-chain** by pushing them to a cheap, specialized L3 while still inheriting Ethereum-level security.
 
-## Project Overview
+Micromint L3 provides:
+- ⚡ Ultra-cheap micropayments using `MicroUSD` token  
+- 💳 **PaymentHub** for deposit → micropay → merchant withdrawal  
+- 🧪 Neo-brutalist frontend demo built with React + Wagmi  
+- 🔗 Flexible bridge design to settle merchant withdrawals on **Arbitrum L2**
 
-This example project includes:
+---
 
-- A simple Hardhat configuration file.
-- Foundry-compatible Solidity unit tests.
-- TypeScript integration tests using [`node:test`](nodejs.org/api/test.html), the new Node.js native test runner, and [`viem`](https://viem.sh/).
-- Examples demonstrating how to connect to different types of networks, including locally simulating OP mainnet.
+# ✨ Features
 
-## Usage
+- **L3-native micropayment system**
+- Simple ERC-20 token (`MicroUSD`) with 6 decimals
+- Smart contract `PaymentHub`:
+  - Users deposit once, then send tiny payments quickly
+  - Merchants accumulate earnings
+  - Merchants withdraw earnings on L3 (and in Phase 2: to L2)
+- Clean React + TypeScript UI (neo-brutalist styling)
+- Full Hardhat setup + deploy scripts
+- Optional L3 → L2 bridging design included
 
-### Running Tests
+---
 
-To run all the tests in the project, execute the following command:
+# 🏗 Architecture Overview
 
-```shell
-npx hardhat test
-```
+                      Ethereum L1
+                          ▲
+                          │
+                   (Rollup settlement)
+                          │
+                  Arbitrum L2 (Sepolia)
+                          ▲
+                          │
+             ┌────────────┴────────────┐
+             │                         │
+       Arbitrum Orbit L3: Micromint (your chain)
+             │
+                  ▲                     ▲
+                  │                     │
+                 User                  Merchant
+         (sends 0.10 mUSD)        (earns & withdraws)
 
-You can also selectively run the Solidity or `node:test` tests:
+---
 
-```shell
-npx hardhat test solidity
-npx hardhat test nodejs
-```
+# 📦 Folder Structure
 
-### Make a deployment to Sepolia
 
-This project includes an example Ignition module to deploy the contract. You can deploy this module to a locally simulated chain or to Sepolia.
+---
 
-To run the deployment to a local chain:
+# 🧩 Smart Contracts
 
-```shell
-npx hardhat ignition deploy ignition/modules/Counter.ts
-```
+## `MicroUSD.sol`
+- Stable-style ERC-20 token with 6 decimals  
+- Mintable by owner (used as faucet on L3)  
+- Used for micropayments  
 
-To run the deployment to Sepolia, you need an account with funds to send the transaction. The provided Hardhat configuration includes a Configuration Variable called `SEPOLIA_PRIVATE_KEY`, which you can use to set the private key of the account you want to use.
+## `PaymentHub.sol`
+- Users deposit mUSD
+- Users send micropayments to merchants  
+- Merchants withdraw on L3
+- Optional: `withdrawToL2()` to route funds to a bridge gateway
 
-You can set the `SEPOLIA_PRIVATE_KEY` variable using the `hardhat-keystore` plugin or by setting it as an environment variable.
+## `L3Gateway.sol`
+- Demo “bridge entry” contract  
+- Holds tokens that are being moved from L3 → L2  
+- Emits `BridgeRequested` event  
+- Real version uses Arbitrum Orbit message passing
 
-To set the `SEPOLIA_PRIVATE_KEY` config variable using `hardhat-keystore`:
+---
 
-```shell
-npx hardhat keystore set SEPOLIA_PRIVATE_KEY
-```
+# ⚙️ Tech Stack
 
-After setting the variable, you can run the deployment with the Sepolia network:
+- **Blockchain**: Arbitrum Orbit L3 (Micromint), Arbitrum Sepolia L2
+- **Contracts**: Solidity (0.8.x), OpenZeppelin
+- **Dev Tooling**: Hardhat, TypeScript, dotenv
+- **Frontend**: Vite + React + TS, Wagmi + Viem
+- **Styling**: Neo-brutalist custom CSS
 
-```shell
-npx hardhat ignition deploy --network sepolia ignition/modules/Counter.ts
-```
+---
+
+# 🚀 Getting Started
+
+## 1. Install backend dependencies
+
+```bash
+npm install
+npx hardhat compile
+L3_RPC_URL=https://your-micromint-l3-rpc
+PRIVATE_KEY=0xyour_test_wallet_private_key
+CHAIN_ID_L3=12345
