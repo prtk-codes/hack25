@@ -47,7 +47,9 @@ Micromint L3 provides:
 
 ---
 
-# 📦 Folder Structure
+# 📦 Preview
+
+<img width="1920" height="1080" alt="Screenshot (162)" src="https://github.com/user-attachments/assets/435e3f34-0724-4fbc-8cae-63059fc7512e" />
 
 
 ---
